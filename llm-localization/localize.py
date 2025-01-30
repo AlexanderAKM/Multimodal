@@ -60,8 +60,8 @@ def extract_batch(
                 activations = layer_representations[layer_name][sample_idx].sum(dim=0).cpu()
             else:  # Default: last-token pooling
                 activations = layer_representations[layer_name][sample_idx][-1].cpu()
-            
-            batch_activations[layer_name].append(activations)
+
+            batch_activations[layer_name] += [activations]
 
     # Remove hooks after activations have been extracted
     for hook in hooks:
