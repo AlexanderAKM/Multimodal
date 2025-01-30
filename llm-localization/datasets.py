@@ -106,6 +106,10 @@ class LangLocDataset(Dataset):
         self.positive = data[data["stim14"] == "S"]["sent"]
         self.negative = data[data["stim14"] == "N"]["sent"]
 
+        # Limit the number of examples to 5, just for now!
+        self.positive = self.positive.iloc[:5]
+        self.negative = self.negative.iloc[:5]
+
     def __getitem__(self, idx):
         """
         Returns the positive and negative example at the given index.

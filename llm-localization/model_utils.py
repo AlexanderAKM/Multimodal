@@ -110,9 +110,7 @@ def get_layer_names(model_name):
 
     # custom support for llava
     elif "llava" in model_name:
-        return [f'model.layers.{layer_num}' 
-            for layer_num in range(num_blocks) 
-            # for layer_desc in ["input_layernorm", "self_attn", "post_attention_layernorm", "mlp"]
-        ]
+        return [f"language_model.model.layers.{layer_num}" 
+            for layer_num in range(num_blocks)]
     else:
         raise ValueError(f"{model_name} not supported currently!")

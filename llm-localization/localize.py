@@ -108,7 +108,7 @@ def extract_representations(
         raise ValueError(f"Unsupported network: {network}")
 
     # Create a DataLoader for iterating through the dataset in batches
-    langloc_dataloader = DataLoader(loc_dataset, batch_size=batch_size, num_workers=0)
+    langloc_dataloader = DataLoader(loc_dataset, batch_size=batch_size, num_workers=0, )
 
     print(f"> Using Device: {device}")
 
@@ -357,11 +357,18 @@ if __name__ == "__main__":
 
     # Load the model: Either from a pretrained Hugging Face checkpoint or randomly initialized
     if pretrained:
-        # model = transformers.AutoModelForCausalLM.from_pretrained(model_name) # for LLMs
+        if "llava" in model_name:
+            model = LlavaForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.float16, device_map="cpu")
+            processor = AutoProcessor.from_pretrained(model_name)
+        else:
+            model = transformers.AutoModelForCausalLM.from_pretrained(model_name) # for LLMs
+        print(model_name)
+        for name, module in model.named_modules():
+            print(name)
+
         # load Llava in half precision
         # model = LlavaForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.float16, device_map="auto")
-        model = LlavaForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.float16, device_map="cpu")
-        processor = AutoProcessor.from_pretrained(model_name)
+        
     else:
         model_config = transformers.AutoConfig.from_pretrained(model_name)
         model = transformers.AutoModelForCausalLM.from_config(config=model_config)
