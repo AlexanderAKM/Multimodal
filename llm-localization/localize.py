@@ -14,6 +14,8 @@ from model_utils import get_layer_names, get_hidden_dim
 from utils import setup_hooks
 from datasets import LangLocDataset, TOMLocDataset, MDLocDataset
 
+from transformers import AutoProcessor, LlavaForConditionalGeneration
+
 # To cache the language mask
 CACHE_DIR = os.environ.get("LOC_CACHE", f"cache")
 
@@ -218,7 +220,10 @@ if  __name__ == "__main__":
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu") if args.device is None else args.device
 
     if pretrained:
-        model = transformers.AutoModelForCausalLM.from_pretrained(model_name)
+        # model = transformers.AutoModelForCausalLM.from_pretrained(model_name) # for LLMs
+        # load Llava in half precision
+        model = LlavaForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.float16, device_map="auto")
+        processor = AutoProcessor.from_pretrained(model_name)
     else:
         model_config = transformers.AutoConfig.from_pretrained(model_name)
         model = transformers.AutoModelForCausalLM.from_config(config=model_config)
