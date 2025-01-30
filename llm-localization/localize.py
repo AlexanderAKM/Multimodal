@@ -359,7 +359,8 @@ if __name__ == "__main__":
     if pretrained:
         # model = transformers.AutoModelForCausalLM.from_pretrained(model_name) # for LLMs
         # load Llava in half precision
-        model = LlavaForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.float16, device_map="auto")
+        # model = LlavaForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.float16, device_map="auto")
+        model = LlavaForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.float16, device_map="cpu")
         processor = AutoProcessor.from_pretrained(model_name)
     else:
         model_config = transformers.AutoConfig.from_pretrained(model_name)
