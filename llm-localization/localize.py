@@ -17,7 +17,7 @@ from datasets import LangLocDataset, TOMLocDataset, MDLocDataset
 from transformers import AutoProcessor, LlavaForConditionalGeneration
 
 # Directory for cached language masks
-CACHE_DIR = os.environ.get("LOC_CACHE", "cache")
+CACHE_DIR = os.environ.get("LOC_CACHE", f"cache")
 
 
 def extract_batch(
