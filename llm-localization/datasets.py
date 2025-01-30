@@ -21,24 +21,30 @@ class MDLocDataset(Dataset):
 
         self.positive = []
         np.random.seed(42)
-        for _ in range(num_examples):
+        for idx in range(num_examples):
             num_1 = np.random.randint(100, 200)
             num_2 = np.random.randint(100, 200)
-            operation = np.random.choice(["+", "-"])
-            
-            question = f"Solve {num_1} {operation} {num_2}?"
-            answer = num_1 + num_2 if operation == "+" else num_1 - num_2
+            add_or_subtract = np.random.choice(["+", "-"])
+            if add_or_subtract == "+":
+                question = f"Solve {num_1} + {num_2}?"
+                answer = num_1 + num_2
+            else:
+                question = f"Solve {num_1} - {num_2}?"
+                answer = num_1 - num_2
             self.positive.append(f"Question: {question}\nAnswer: {answer}")
-
+            
         self.negative = []
         np.random.seed(42)
-        for _ in range(num_examples):
+        for idx in range(num_examples):
             num_1 = np.random.randint(1, 20)
             num_2 = np.random.randint(1, 20)
-            operation = np.random.choice(["+", "-"])
-            
-            question = f"Solve {num_1} {operation} {num_2}?"
-            answer = num_1 + num_2 if operation == "+" else num_1 - num_2
+            add_or_subtract = np.random.choice(["+", "-"])
+            if add_or_subtract == "+":
+                question = f"Solve {num_1} + {num_2}?"
+                answer = num_1 + num_2
+            else:
+                question = f"Solve {num_1} - {num_2}?"
+                answer = num_1 - num_2
             self.negative.append(f"Question: {question}\nAnswer: {answer}")
 
     def __getitem__(self, idx):
@@ -132,14 +138,9 @@ class TOMLocDataset(Dataset):
         categorizing them as positive (belief-based) or negative (photograph-based).
         """
         dirpath = "stimuli/tom/tomloc"
-        instruction = (
-            "In this experiment, you will read a series of sentences "
-            "and then answer True/False questions about them. "
-            "Press button 1 to answer 'true' and button 2 to answer 'false'."
-        )
-        context_template = (
-            "{instruction}\nStory: {story}\nQuestion: {question}\nAnswer: {answer}"
-        )
+        instruction = "In this experiment, you will read a series of sentences and then answer True/False questions about them. Press button 1 to answer 'true' and button 2 to answer 'false'."
+        context_template = "{instruction}\nStory: {story}\nQuestion: {question}\nAnswer: {answer}"
+        
         
         # Load stories and questions
         belief_stories = [read_story(f"{dirpath}/{idx}b_story.txt") for idx in range(1, 11)]
@@ -149,19 +150,9 @@ class TOMLocDataset(Dataset):
         photograph_questions = [read_question(f"{dirpath}/{idx}p_question.txt") for idx in range(1, 11)]
 
         # Create positive (belief-based) and negative (photo-based) examples
-        self.positive = [
-            context_template.format(
-                instruction=instruction, story=story, question=question,
-                answer=np.random.choice(["True", "False"])
-            ) for story, question in zip(belief_stories, belief_questions)
-        ]
-        
-        self.negative = [
-            context_template.format(
-                instruction=instruction, story=story, question=question,
-                answer=np.random.choice(["True", "False"])
-            ) for story, question in zip(photograph_stories, photograph_questions)
-        ]
+        self.positive = [context_template.format(instruction=instruction, story=story, question=question, answer=np.random.choice(["True", "False"])) for story, question in zip(belief_stories, belief_question)]
+        self.negative = [context_template.format(instruction=instruction, story=story, question=question, answer=np.random.choice(["True", "False"])) for story, question in zip(photograph_stories, photograph_question)]
+
 
     def __getitem__(self, idx):
         """
