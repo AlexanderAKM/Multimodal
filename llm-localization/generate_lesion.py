@@ -11,15 +11,28 @@ from models.modeling_gemma import GemmaForCausalLM
 from models.modeling_falcon import FalconForCausalLM
 from models.modeling_mistral import MistralForCausalLM
 
-CACHE_DIR = os.environ.get("LOC_CACHE", f"cache")
+# Directory for cached model data
+CACHE_DIR = os.environ.get("LOC_CACHE", "cache")
 
 if __name__ == "__main__":
+    """
+    Script to load a specified language model, apply a localization mask, and generate text output.
 
+    Arguments:
+        --model-name (str, required): The name of the model to be loaded.
+        --prompt (str, required): The input prompt for text generation.
+        --percentage (float, required): The percentage of active units for localization masking.
+        --network (str, optional): Type of network mask to apply (default: 'language').
+        --device (str, optional): Device for model execution ('cuda' or 'cpu').
+        --seed (int, optional): Random seed for reproducibility (default: 42).
+        --pooling (str, optional): Pooling method, either 'last-token' or 'mean' (default: 'last-token').
+        --localize-range (str, optional): Range specification for localization (default: '100-100').
+    """
     argparser = argparse.ArgumentParser()
     argparser.add_argument("--model-name", type=str, required=True)
     argparser.add_argument("--prompt", type=str, required=True)
     argparser.add_argument("--percentage", type=float, required=True)
-    argparser.add_argument("--network", type=str, default="language", choices=["language", "random", "none"])   
+    argparser.add_argument("--network", type=str, default="language", choices=["language", "random", "none"])
     argparser.add_argument("--device", type=str, default=None)
     argparser.add_argument("--seed", type=int, default=42)
     argparser.add_argument("--pooling", type=str, default="last-token", choices=["last-token", "mean"])
@@ -27,9 +40,10 @@ if __name__ == "__main__":
 
     args = argparser.parse_args()
 
+    # Set up configurations
     seed = args.seed
     percentage = args.percentage
-    device = args.device if args.device is not None else "cuda" if torch.cuda.is_available() else "cpu"
+    device = args.device if args.device is not None else ("cuda" if torch.cuda.is_available() else "cpu")
     model_name = args.model_name
     network = args.network
     prompt = args.prompt
@@ -38,6 +52,7 @@ if __name__ == "__main__":
 
     print(f"> Running with model {model_name}")
 
+    # Load the specified model
     if "gpt2" in model_name:
         model = GPT2LMHeadModel.from_pretrained(model_name)
     elif "Llama" in model_name:
@@ -59,15 +74,15 @@ if __name__ == "__main__":
     model.eval()
     print(model)
 
-    model_name = os.path.basename(model_name)
-
     print(f"> Running with {network} mask")
 
+    # Define the mask path
     if network in ["language", "random"]:
         mask_path = f"{model_name}_network=language_pooling={pooling}_range={loc_range}_perc={percentage}_nunits=None_pretrained=True.npy"
     else:
         mask_path = None
 
+    # Load and apply the language mask
     if mask_path is not None:
         language_mask = np.load(f"{CACHE_DIR}/{mask_path}")
         num_active_units = int(language_mask.sum())
@@ -83,14 +98,13 @@ if __name__ == "__main__":
             assert np.sum(lang_mask_rand) == num_active_units
             language_mask = lang_mask_rand.reshape((num_layers, hidden_dim))
 
-
         model.set_language_selective_mask(torch.tensor(language_mask).to(device))
         print("Loaded language mask with", num_active_units, "units, with shape", language_mask.shape)
     else:
         model.set_language_selective_mask(None)
 
+    # Prepare inputs and generate text
     inputs = tokenizer(prompt, return_tensors="pt").to(device)
-
     outputs = model.generate(
         **inputs,
         max_length=20,
