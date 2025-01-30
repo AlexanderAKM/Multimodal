@@ -18,6 +18,7 @@ model_name_map = {
     "falcon-7b-instruct": "Falcon-7B-Instruct",
     "Mistral-7B-Instruct-v0.3": "Mistral-7B-Instruct",
     "Mistral-7B-v0.3": "Mistral-7B",
+    "llava-1.5-7b-hf": "llava-1.5-7b-hf"
 }
 
 def get_num_blocks(model_name):
@@ -51,6 +52,8 @@ def get_num_blocks(model_name):
         "gemma-1.1-2b-it": 18,
         "gemma-7b": 28,
         "gemma-1.1-7b-it": 28,
+
+        "llava-1.5-7b-hf":32
     }[model_name]
 
 def get_hidden_dim(model_name):
@@ -86,6 +89,8 @@ def get_hidden_dim(model_name):
 
         "Mistral-7B-v0.3": 4096,
         "Mistral-7B-Instruct-v0.3": 4096,
+
+        "llava-1.5-7b-hf":4096
     }[model_name]
 
 
@@ -102,5 +107,12 @@ def get_layer_names(model_name):
             for layer_num in range(num_blocks) 
             # for layer_desc in ["input_layernorm", "self_attn", "post_attention_layernorm", "mlp"]
         ]  
+
+    # custom support for llava
+    elif "llava" in model_name:
+        return [f'model.layers.{layer_num}' 
+            for layer_num in range(num_blocks) 
+            # for layer_desc in ["input_layernorm", "self_attn", "post_attention_layernorm", "mlp"]
+        ]
     else:
         raise ValueError(f"{model_name} not supported currently!")

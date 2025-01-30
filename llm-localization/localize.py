@@ -357,10 +357,11 @@ if __name__ == "__main__":
 
     # Load the model: Either from a pretrained Hugging Face checkpoint or randomly initialized
     if pretrained:
-        model = transformers.AutoModelForCausalLM.from_pretrained(model_name) # for LLMs
+        # model = transformers.AutoModelForCausalLM.from_pretrained(model_name) # for LLMs
         # load Llava in half precision
         # model = LlavaForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.float16, device_map="auto")
-        # processor = AutoProcessor.from_pretrained(model_name)
+        model = LlavaForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.float16, device_map="cpu")
+        processor = AutoProcessor.from_pretrained(model_name)
     else:
         model_config = transformers.AutoConfig.from_pretrained(model_name)
         model = transformers.AutoModelForCausalLM.from_config(config=model_config)
