@@ -108,7 +108,7 @@ def extract_representations(
         raise ValueError(f"Unsupported network: {network}")
 
     # Create a DataLoader for iterating through the dataset in batches
-    langloc_dataloader = DataLoader(loc_dataset, batch_size=batch_size, num_workers=0, )
+    langloc_dataloader = DataLoader(loc_dataset, batch_size=batch_size, num_workers=0)
 
     print(f"> Using Device: {device}")
 
