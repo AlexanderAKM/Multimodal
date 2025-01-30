@@ -10,4 +10,12 @@ TODO:
 - "We then capture the activations from the units at the output of each Transformer block for each stimulus. We define the model’s language network as the top-k units that maximize the difference in activation magnitude between sentences and strings of non-words, measured by positive t-values from a Welch’s t-test.
 - They define a "unit" to be each dimension after a Transformer block.
 - They do 10 models, we should do 2/3?
-- 
+- They ablate top-{0.125, 0.25, 0.5, 1}% of language-selective units so we can do this similarly for all tasks.
+- Then they look at similarity between the language network in LLMs and Brains
+    - They have four conditions based (matrix lexical vs syntactical)
+    - In neuroscience the normal sentences show a lot more activation than the other three.
+    - This is similar int he language networks in LLMs.
+- They do some pearson correlation between the predicted brain activity of people on two neuroscience datasets.
+    - With a percentage of units (language vs random) they predict brain activity doing ridge regression
+    - Some significance but I'm not too sure what this shows.
+    
