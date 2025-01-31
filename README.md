@@ -18,4 +18,7 @@ TODO:
 - They do some pearson correlation between the predicted brain activity of people on two neuroscience datasets.
     - With a percentage of units (language vs random) they predict brain activity doing ridge regression
     - Some significance but I'm not too sure what this shows.
+- I don't quite see the point in the above (although it is interesting). Rather, we could do **feature visualization**!!
+    - They only show the distribution of significant units in the respective layers, but it would be way cooler if we
+    - actually visualized it. This would be similar to fMRI!
     
