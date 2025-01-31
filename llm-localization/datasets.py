@@ -169,3 +169,7 @@ class TOMLocDataset(Dataset):
         Returns the total number of positive examples.
         """
         return len(self.positive)
+    
+class ImageLocDataset(Dataset):
+    def _init__(self):
+        pass
