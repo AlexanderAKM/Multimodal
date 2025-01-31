@@ -4,6 +4,7 @@ Project of identifying causally task-relevant units in multi-modal models. Build
 TODO:
 - fix cache issue
     - ``localize.py`` works in the first time, but after caching, it does not work.
+- What vision dataset do we want to use? Just images vs non-images for localization? Decided not to start working on this just yet.
 
 
 # Important bits methodology
