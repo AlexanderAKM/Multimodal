@@ -21,4 +21,6 @@ TODO:
 - I don't quite see the point in the above (although it is interesting). Rather, we could do **feature visualization**!!
     - They only show the distribution of significant units in the respective layers, but it would be way cooler if we
     - actually visualized it. This would be similar to fMRI!
+- Our paper should focus more on *AI alignment* and how we approach this through *neuralignment*.
+    - If we manage to show these specializations in the architecture, that is quite a find for interpretability of the model.
     
