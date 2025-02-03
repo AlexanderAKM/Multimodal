@@ -24,4 +24,6 @@ TODO:
     - actually visualized it. This would be similar to fMRI!
 - Our paper should focus more on *AI alignment* and how we approach this through *neuralignment*.
     - If we manage to show these specializations in the architecture, that is quite a find for interpretability of the model.
+
+- Look at CHIP (Conflict avoidance, Higher capacity, Increased processing Speed, Parallel processing) relating lateralization/specialization in human brain.
     
