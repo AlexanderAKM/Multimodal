@@ -26,4 +26,7 @@ TODO:
     - If we manage to show these specializations in the architecture, that is quite a find for interpretability of the model.
 
 - Look at CHIP (Conflict avoidance, Higher capacity, Increased processing Speed, Parallel processing) relating lateralization/specialization in human brain.
+
+- "No one in neuroscience has tried vision vs. non-vision :)"
+- Should definitely look at the model architecture in more depth and see where the language and vision units should be expected to be identified.
     
