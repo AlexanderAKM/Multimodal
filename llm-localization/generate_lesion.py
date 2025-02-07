@@ -65,6 +65,8 @@ if __name__ == "__main__":
         model = FalconForCausalLM.from_pretrained(model_name)
     elif "Mistral" in model_name:
         model = MistralForCausalLM.from_pretrained(model_name)
+    elif "llava" in model_name:
+        model = 
     else:
         raise ValueError(f"Model {model_name} not supported")
 
