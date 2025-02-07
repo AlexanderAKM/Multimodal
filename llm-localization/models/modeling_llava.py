@@ -425,6 +425,7 @@ class LlavaForConditionalGeneration(LlavaPreTrainedModel, GenerationMixin):
         cache_position: Optional[torch.LongTensor] = None,
         logits_to_keep: Union[int, torch.Tensor] = 0,
         image_sizes: torch.Tensor = None,
+        language_selective_mask: Optional[torch.BoolTensor] = None, # TODO: implement this (Haukur, Alexander)
         **lm_kwargs,
     ) -> Union[Tuple, LlavaCausalLMOutputWithPast]:
         r"""
