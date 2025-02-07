@@ -7,7 +7,7 @@
 #         --network $network
 # done 
 # LOC_CACHE="C:Users\User\Personal Projects\Multimodal\llm-localization\cache"
-cd llm-localization/
+# cd llm-localization/
 for network in language random none;
 do
     python -m generate_lesion \

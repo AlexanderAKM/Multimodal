@@ -82,7 +82,7 @@ if __name__ == "__main__":
 
     # Define the mask path
     if network in ["language", "random"]:
-        mask_path = f"{model_name}_network=language_pooling={pooling}_range={loc_range}_perc={percentage}_nunits=None_pretrained=True.npy"
+        mask_path = f"{model_name.split('/')[-1]}_network=language_pooling={pooling}_range={loc_range}_perc={percentage}_nunits=None_pretrained=True.npy"
     else:
         mask_path = None
     print(f"{CACHE_DIR}//{mask_path}")
