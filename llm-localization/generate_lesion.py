@@ -3,12 +3,13 @@ import torch
 import argparse
 import numpy as np
 from transformers import AutoTokenizer
+from transformers import AutoProcessor, LlavaForConditionalGeneration
 
 from models.modeling_gpt2 import GPT2LMHeadModel
 from models.modeling_llama import LlamaForCausalLM
 from models.modeling_phi3 import Phi3ForCausalLM
 from models.modeling_gemma import GemmaForCausalLM
-from models.modeling_falcon import FalconForCausalLM
+#from models.modeling_falcon import FalconForCausalLM
 from models.modeling_mistral import MistralForCausalLM
 
 # Directory for cached model data
@@ -66,7 +67,8 @@ if __name__ == "__main__":
     elif "Mistral" in model_name:
         model = MistralForCausalLM.from_pretrained(model_name)
     elif "llava" in model_name:
-        model = 
+        model = LlavaForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.float16, device_map="cpu")
+        processor = AutoProcessor.from_pretrained(model_name)
     else:
         raise ValueError(f"Model {model_name} not supported")
 
@@ -83,7 +85,7 @@ if __name__ == "__main__":
         mask_path = f"{model_name}_network=language_pooling={pooling}_range={loc_range}_perc={percentage}_nunits=None_pretrained=True.npy"
     else:
         mask_path = None
-
+    print(f"{CACHE_DIR}//{mask_path}")
     # Load and apply the language mask
     if mask_path is not None:
         language_mask = np.load(f"{CACHE_DIR}/{mask_path}")
@@ -99,9 +101,9 @@ if __name__ == "__main__":
             lang_mask_rand[rand_indices] = 1
             assert np.sum(lang_mask_rand) == num_active_units
             language_mask = lang_mask_rand.reshape((num_layers, hidden_dim))
+        print("Loaded language mask with", num_active_units, "units, with shape", language_mask.shape)
 
         model.set_language_selective_mask(torch.tensor(language_mask).to(device))
-        print("Loaded language mask with", num_active_units, "units, with shape", language_mask.shape)
     else:
         model.set_language_selective_mask(None)
 
