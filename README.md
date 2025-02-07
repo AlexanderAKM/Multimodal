@@ -4,7 +4,16 @@ Project of identifying causally task-relevant units in multi-modal models. Build
 TODO:
 - fix cache issue
     - ``localize.py`` works in the first time, but after caching, it does not work.
-- What vision dataset do we want to use? Just images vs non-images for localization? Decided not to start working on this just yet.
+- What vision dataset do we want to use?
+    - Decided images vs random pixels
+    - Still need to find dataset 
+    - Also still need to create proper class and functionality
+- Need to add selective_language_mask in *new* llava model.
+    - Thus, we should not import conditional thingie but rather our own model and change it for every part.
+    - Add functionality selective_language_mask in model (should be very similar to llama).
+- Change cpu inference to GPU inference.
+    - Get compute from AISIG?
+    - Rerun bash localize lesions for full dataset instead of 5.
 
 
 # Important bits methodology
