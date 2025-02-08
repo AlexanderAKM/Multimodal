@@ -3,14 +3,15 @@ import torch
 import argparse
 import numpy as np
 from transformers import AutoTokenizer
-from transformers import AutoProcessor, LlavaForConditionalGeneration
+from transformers import AutoProcessor
 
 from models.modeling_gpt2 import GPT2LMHeadModel
 from models.modeling_llama import LlamaForCausalLM
 from models.modeling_phi3 import Phi3ForCausalLM
 from models.modeling_gemma import GemmaForCausalLM
-#from models.modeling_falcon import FalconForCausalLM
+# from models.modeling_falcon import FalconForCausalLM
 from models.modeling_mistral import MistralForCausalLM
+from models.modeling_llava import LlavaForConditionalGeneration
 
 # Directory for cached model data
 CACHE_DIR = os.environ.get("LOC_CACHE", "cache")
@@ -44,7 +45,21 @@ if __name__ == "__main__":
     # Set up configurations
     seed = args.seed
     percentage = args.percentage
-    device = args.device if args.device is not None else ("cuda" if torch.cuda.is_available() else "cpu")
+
+
+    # Determine device: CUDA, CPU, or MPS
+    device = "cpu" # Default to CPU
+
+    if torch.cuda.is_available():
+        device = "cuda"
+
+    if torch.backends.mps.is_available():
+        device = "mps"
+
+    # override device if specified
+    if args.device is not None:
+        device = args.device
+
     model_name = args.model_name
     network = args.network
     prompt = args.prompt
