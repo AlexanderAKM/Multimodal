@@ -79,6 +79,7 @@ def extract_representations(
     hidden_dim: int,
     batch_size: int,
     device: torch.device,
+    processor: transformers.AutoProcessor = None,
 ) -> Dict[str, Dict[str, np.array]]:
     """
     Extracts hidden representations from a given model for a specified dataset.
@@ -91,7 +92,8 @@ def extract_representations(
         layer_names (List[str]): Layers from which to extract activations.
         hidden_dim (int): Dimensionality of hidden states.
         batch_size (int): Number of samples per batch.
-        device (torch.device): Device to run computations ('cuda' or 'cpu').
+        device (torch.device): Device to run computations ('mps', 'cuda' or 'cpu').
+        processor (transformers.AutoProcessor, optional): Processor for multimodal models (e.g., Llava).
 
     Returns:
         Dict[str, Dict[str, np.array]]: Dictionary containing positive and negative activations.
@@ -129,12 +131,21 @@ def extract_representations(
         sents, non_words = batch_data
 
         # Tokenize samples
-        if network == "language":
-            sent_tokens = tokenizer(sents, truncation=True, max_length=12, return_tensors='pt').to(device)
-            non_words_tokens = tokenizer(non_words, truncation=True, max_length=12, return_tensors='pt').to(device)
+        if processor: # for multimodal models (e.g., Llava) use the processor and lower precision
+            if network == "language":
+                sent_tokens = processor(images=None, text=sents, truncation=True, max_length=12, return_tensors='pt').to(device, torch.float16)
+                non_words_tokens = processor(images=None, text=non_words, truncation=True, max_length=12, return_tensors='pt').to(device, torch.float16)
+            else:
+                sent_tokens = processor(images=None, text=sents,return_tensors='pt').to(device, torch.float16)
+                non_words_tokens = processor(images=None, text=non_words,return_tensors='pt').to(device, torch.float16)
         else:
-            sent_tokens = tokenizer(sents, padding=True, return_tensors='pt').to(device)
-            non_words_tokens = tokenizer(non_words, padding=True, return_tensors='pt').to(device)
+            if network == "language":
+                sent_tokens = tokenizer(sents, truncation=True, max_length=12, return_tensors='pt').to(device)
+                non_words_tokens = tokenizer(non_words, truncation=True, max_length=12, return_tensors='pt').to(device)
+            else:
+                sent_tokens = tokenizer(sents, return_tensors='pt').to(device)
+                non_words_tokens = tokenizer(non_words, return_tensors='pt').to(device)
+
 
         # Extract activations from model for both positive and negative samples
         batch_real_actv = extract_batch(model, sent_tokens["input_ids"], sent_tokens["attention_mask"], layer_names, pooling)
@@ -162,6 +173,7 @@ def localize(model_id: str,
     localize_range: str = None,
     pretrained: bool = True,
     overwrite: bool = False,
+    processor: transformers.AutoProcessor = None,
 ):
     """
     Identifies and localizes selective units in a transformer model based on their statistical significance
@@ -178,11 +190,12 @@ def localize(model_id: str,
         layer_names (List[str]): List of layers to analyze.
         batch_size (int): Batch size for processing.
         seed (int): Random seed for reproducibility.
-        device (torch.device): Device ('cuda' or 'cpu') for computations.
+        device (torch.device): Device ('mps', 'cuda' or 'cpu') for computations.
         percentage (float, optional): Percentage of units to select (overrides `num_units`).
         localize_range (str, optional): Percentile range for selection, e.g., '100-100' or '0-0'.
         pretrained (bool, optional): Whether to use a pretrained model.
         overwrite (bool, optional): If True, overwrite existing cached masks.
+        processor (transformers.AutoProcessor, optional): Processor for multimodal models (e.g., Llava).
 
     Returns:
         np.array: Binary mask indicating localized units.
@@ -210,6 +223,7 @@ def localize(model_id: str,
         hidden_dim=hidden_dim, 
         batch_size=batch_size, 
         device=device,
+        processor=processor,
     )
 
     # Initialize matrices to store t-test and p-values across layers
@@ -352,22 +366,30 @@ if __name__ == "__main__":
     seed = args.seed
     batch_size = 1  # Set batch size for processing
 
-    # Determine device: Default to CUDA if available, otherwise use CPU
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu") if args.device is None else args.device
+    # Determine device: CUDA, CPU, or MPS
+    device = "cpu" # Default to CPU
 
-    # Load the model: Either from a pretrained Hugging Face checkpoint or randomly initialized
+    if torch.cuda.is_available():
+        device = "cuda"
+
+    if torch.backends.mps.is_available():
+        device = "mps"
+
+    # override device if specified
+    if args.device is not None:
+        device = args.device
+
+
+    # Load the model: Either from a pretrained HuggingFace checkpoint or randomly initialized
     if pretrained:
         if "llava" in model_name:
-            model = LlavaForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.float16, device_map="cpu")
-            processor = AutoProcessor.from_pretrained(model_name)
+            model = LlavaForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.float16, device_map=device)
+            processor = AutoProcessor.from_pretrained(model_name, use_fast=False)
         else:
             model = transformers.AutoModelForCausalLM.from_pretrained(model_name) # for LLMs
-        print(model_name)
-        for name, module in model.named_modules():
-            print(name)
-
-        # load Llava in half precision
-        # model = LlavaForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.float16, device_map="auto")
+        # print(model_name)
+        # for name, module in model.named_modules():
+        #     print(name)
         
     else:
         model_config = transformers.AutoConfig.from_pretrained(model_name)
@@ -404,4 +426,5 @@ if __name__ == "__main__":
         localize_range=localize_range,
         pretrained=pretrained,
         overwrite=args.overwrite,
+        processor=processor if "llava" in model_name else None,
     )

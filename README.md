@@ -6,7 +6,7 @@ Project of identifying causally task-relevant units in multi-modal models. Build
 First clone the repository and install the requirements.
 
 ```bash
-conda create -n multimodal python=3.8
+conda create -n multimodal python=3.10
 conda activate multimodal
 pip install -r requirements.txt
 ```
