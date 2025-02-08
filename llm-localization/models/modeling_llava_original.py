@@ -21,21 +21,19 @@ import torch
 import torch.utils.checkpoint
 from torch import nn
 
-from transformers.activations import ACT2FN
-from transformers.generation import GenerationMixin
-from transformers.modeling_outputs import ModelOutput
-from transformers.modeling_utils import PreTrainedModel
-from transformers.utils import (
+from ...activations import ACT2FN
+from ...generation import GenerationMixin
+from ...modeling_outputs import ModelOutput
+from ...modeling_utils import PreTrainedModel
+from ...utils import (
     add_start_docstrings,
     add_start_docstrings_to_model_forward,
     logging,
     replace_return_docstrings,
 )
-from transformers.utils.deprecation import deprecate_kwarg
-from transformers import AutoModel, AutoModelForCausalLM
-
-# from transformers.configuration_llava import LlavaConfig
-from transformers.models.llava.configuration_llava import LlavaConfig
+from ...utils.deprecation import deprecate_kwarg
+from ..auto import AutoModel, AutoModelForCausalLM
+from .configuration_llava import LlavaConfig
 
 
 logger = logging.get_logger(__name__)
@@ -427,7 +425,6 @@ class LlavaForConditionalGeneration(LlavaPreTrainedModel, GenerationMixin):
         cache_position: Optional[torch.LongTensor] = None,
         logits_to_keep: Union[int, torch.Tensor] = 0,
         image_sizes: torch.Tensor = None,
-        language_selective_mask: Optional[torch.BoolTensor] = None, # TODO: implement this (Haukur, Alexander)
         **lm_kwargs,
     ) -> Union[Tuple, LlavaCausalLMOutputWithPast]:
         r"""
@@ -551,9 +548,6 @@ class LlavaForConditionalGeneration(LlavaPreTrainedModel, GenerationMixin):
             output = (logits,) + outputs[1:]
             return (loss,) + output if loss is not None else output
 
-        # TODO: we need to lesion hidden states and attentions here
-        # before LlavaCausalLMOutputWithPast is called
-
         return LlavaCausalLMOutputWithPast(
             loss=loss,
             logits=logits,
@@ -592,9 +586,6 @@ class LlavaForConditionalGeneration(LlavaPreTrainedModel, GenerationMixin):
             model_inputs["pixel_values"] = pixel_values
 
         return model_inputs
-
-    def set_multimodal_selective_mask(self, multimodal_selective_mask):
-        self.multimodal_selective_mask = multimodal_selective_mask
 
 
 __all__ = ["LlavaForConditionalGeneration", "LlavaPreTrainedModel"]
