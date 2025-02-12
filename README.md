@@ -15,18 +15,18 @@ pip install -r requirements.txt
 ## TODO
 
 TODO:
-- fix cache issue
-    - ``localize.py`` works in the first time, but after caching, it does not work.
-- What vision dataset do we want to use?
-    - Decided images vs random pixels
-    - Still need to find dataset 
-    - Also still need to create proper class and functionality
+- Decided images vs random pixels
+- Still need to find/create dataset
+- Also still need to create proper class and functionality
 - Need to add selective_language_mask in *new* llava model.
-    - Thus, we should not import conditional thingie but rather our own model and change it for every part.
+    - So we have added the model.
     - Add functionality selective_language_mask in model (should be very similar to llama).
-- Change cpu inference to GPU inference.
-    - Get compute from AISIG?
+        - We swap out the LLM part with our llama model
+        - It should inherit the language mask and then it should work.
+
+- Get compute from AISIG?
     - Rerun bash localize lesions for full dataset instead of 5.
+
 
 
 # Important bits methodology
