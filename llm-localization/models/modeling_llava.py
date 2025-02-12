@@ -37,6 +37,9 @@ from transformers import AutoModel, AutoModelForCausalLM
 # from transformers.configuration_llava import LlavaConfig
 from transformers.models.llava.configuration_llava import LlavaConfig
 
+from models.modeling_llama import LlamaForCausalLM
+
+
 
 logger = logging.get_logger(__name__)
 
@@ -250,7 +253,11 @@ class LlavaForConditionalGeneration(LlavaPreTrainedModel, GenerationMixin):
 
         self.multi_modal_projector = LlavaMultiModalProjector(config)
         self.vocab_size = config.text_config.vocab_size
+
+        # THOUGHT: What if we swap the automodel for LLAMA with selective mask? 
+        # here, and then we pass the selective mask from this model to the automodel
         self.language_model = AutoModelForCausalLM.from_config(config.text_config)
+        # self.language_model = LlamaForCausalLM.from_pretrained(config.text_config._name_or_path)
 
         if self.language_model._tied_weights_keys is not None:
             self._tied_weights_keys = [f"language_model.{k}" for k in self.language_model._tied_weights_keys]
@@ -513,6 +520,8 @@ class LlavaForConditionalGeneration(LlavaPreTrainedModel, GenerationMixin):
             image_features = image_features.to(inputs_embeds.device, inputs_embeds.dtype)
             inputs_embeds = inputs_embeds.masked_scatter(special_image_mask, image_features)
 
+
+        # TODO: implement selective mask for language model
         outputs = self.language_model(
             attention_mask=attention_mask,
             position_ids=position_ids,
