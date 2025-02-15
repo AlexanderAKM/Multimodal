@@ -118,7 +118,7 @@ if __name__ == "__main__":
             language_mask = lang_mask_rand.reshape((num_layers, hidden_dim))
         print("Loaded language mask with", num_active_units, "units, with shape", language_mask.shape)
 
-        model.set_language_selective_mask(torch.tensor(language_mask).to(device))
+        model.set_language_selective_mask(torch.tensor(language_mask).to(device)) # trouble
     else:
         model.set_language_selective_mask(None)
 

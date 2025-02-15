@@ -384,7 +384,7 @@ if __name__ == "__main__":
     if pretrained:
         if "llava" in model_name:
             model = LlavaForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.float16, device_map=device)
-            processor = AutoProcessor.from_pretrained(model_name, use_fast=False)
+            processor = AutoProcessor.from_pretrained(model_name, use_fast=False) # think twice about this
         else:
             model = transformers.AutoModelForCausalLM.from_pretrained(model_name) # for LLMs
         # print(model_name)
