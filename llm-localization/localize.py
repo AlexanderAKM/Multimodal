@@ -12,7 +12,7 @@ from scipy.stats import ttest_ind, false_discovery_control
 
 from model_utils import get_layer_names, get_hidden_dim
 from utils import setup_hooks
-from datasets import LangLocDataset, TOMLocDataset, MDLocDataset
+from dataset import LangLocDataset, TOMLocDataset, MDLocDataset
 
 from transformers import AutoProcessor, LlavaForConditionalGeneration
 

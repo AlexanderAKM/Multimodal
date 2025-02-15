@@ -13,6 +13,8 @@ from models.modeling_gemma import GemmaForCausalLM
 from models.modeling_mistral import MistralForCausalLM
 from models.modeling_llava import LlavaForConditionalGeneration
 
+from eval import run_eval
+
 # Directory for cached model data
 CACHE_DIR = os.environ.get("LOC_CACHE", "cache")
 
@@ -123,14 +125,19 @@ if __name__ == "__main__":
 
     print("Language mask applied")
 
+    # QUALIATIVELY EVALUATE
     # Prepare inputs and generate text
-    inputs = tokenizer(prompt, return_tensors="pt").to(device)
-    outputs = model.generate(
-        **inputs,
-        max_length=20, # original 20
-        do_sample=True,
-        temperature=0.7,
-        num_return_sequences=1,
-    )
+    # inputs = tokenizer(prompt, return_tensors="pt").to(device)
+    # outputs = model.generate(
+    #     **inputs,
+    #     max_length=20, # original 20
+    #     do_sample=True,
+    #     temperature=0.7,
+    #     num_return_sequences=1,
+    # )
 
-    print(tokenizer.decode(outputs[0], skip_special_tokens=True))
+    # print(tokenizer.decode(outputs[0], skip_special_tokens=True))
+
+
+    # Benchmarks
+    run_eval(model, processor, device=device)
