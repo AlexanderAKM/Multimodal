@@ -15,15 +15,21 @@ pip install -r requirements.txt
 ## TODO
 
 TODO:
-1. We change generate_lesion.py so that it runs on benchmark and saves performance.
-    - Glue, Blimp, SyntaxGym
 
-2. Get compute from AISIG?
+1. Get compute from AISIG?
     - Rerun bash localize lesions for full dataset instead of 5.
+
+2. We change generate_lesion.py so that it runs on benchmark and saves performance.
+    - Glue, Blimp, SyntaxGym
+    - some vision dataset?
 
 3. We find/create vision dataset of images vs random pixels. 
     - Create proper Class for it.
     - Should be able to run llava on it.
+
+4. After vision dataset, run localize lesions on it.
+
+
 
 
 
