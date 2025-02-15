@@ -127,7 +127,7 @@ if __name__ == "__main__":
     inputs = tokenizer(prompt, return_tensors="pt").to(device)
     outputs = model.generate(
         **inputs,
-        max_length=2, # original 20
+        max_length=20, # original 20
         do_sample=True,
         temperature=0.7,
         num_return_sequences=1,

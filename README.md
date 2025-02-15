@@ -18,11 +18,6 @@ TODO:
 - Decided images vs random pixels
 - Still need to find/create dataset
 - Also still need to create proper class and functionality
-- Need to add selective_language_mask in *new* llava model.
-    - So we have added the model.
-    - Add functionality selective_language_mask in model (should be very similar to llama).
-        - We swap out the LLM part with our llama model
-        - It should inherit the language mask and then it should work.
 
 - Get compute from AISIG?
     - Rerun bash localize lesions for full dataset instead of 5.
