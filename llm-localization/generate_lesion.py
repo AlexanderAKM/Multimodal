@@ -82,18 +82,17 @@ if __name__ == "__main__":
     elif "Mistral" in model_name:
         model = MistralForCausalLM.from_pretrained(model_name)
     elif "llava" in model_name:
-        model = LlavaForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.float16, device_map="cpu")
+        model = LlavaForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.float16, device_map=device)
         processor = AutoProcessor.from_pretrained(model_name)
     else:
         raise ValueError(f"Model {model_name} not supported")
 
     tokenizer = AutoTokenizer.from_pretrained(model_name)
-
     model.to(device)
     model.eval()
-    print(model)
+    # print(model)
 
-    print(f"> Running with {network} mask")
+    # print(f"> Running with {network} mask")
 
     # Define the mask path
     if network in ["language", "random"]:

@@ -256,8 +256,8 @@ class LlavaForConditionalGeneration(LlavaPreTrainedModel, GenerationMixin):
 
         # THOUGHT: What if we swap the automodel for LLAMA with selective mask? 
         # here, and then we pass the selective mask from this model to the automodel
-        self.language_model = AutoModelForCausalLM.from_config(config.text_config)
-        # self.language_model = LlamaForCausalLM.from_pretrained(config.text_config._name_or_path)
+        # self.language_model = AutoModelForCausalLM.from_config(config.text_config) # ORIGINAL
+        self.language_model = LlamaForCausalLM._from_config(config.text_config)
 
         if self.language_model._tied_weights_keys is not None:
             self._tied_weights_keys = [f"language_model.{k}" for k in self.language_model._tied_weights_keys]
@@ -602,8 +602,6 @@ class LlavaForConditionalGeneration(LlavaPreTrainedModel, GenerationMixin):
 
         return model_inputs
 
-    def set_multimodal_selective_mask(self, multimodal_selective_mask):
-        self.multimodal_selective_mask = multimodal_selective_mask
-
-
+    def set_language_selective_mask(self, mask):
+        self.language_model.set_language_selective_mask(mask)
 __all__ = ["LlavaForConditionalGeneration", "LlavaPreTrainedModel"]
