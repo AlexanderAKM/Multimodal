@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 
 from model_utils import model_name_map, get_num_blocks, get_hidden_dim
 
-percentage = 1
+percentage = 0.1
 threshold = 0.05
-network = "multiple-demand" #"theory-of-mind"
-model_name = "Llama-3.2-3B-Instruct"
+network = "language" #"theory-of-mind"
+model_name = "llava-hf/llava-1.5-7b-hf"
 
 plot_data = {"selectivity": [], "layer_num": [], "model_name": []}  
 
@@ -22,6 +22,9 @@ print(f"Model: {model_name}")
 pooling = "mean" if network != "lang" else "last-token"
 model_loc_path = f"{model_name}_network={network}_pooling={pooling}_range=100-100_perc={percentage}_nunits=None_pretrained=True.npy"
 model_loc_path = f"{model_name}_network={network}_pooling={pooling}_pretrained=True_pvalues.npy"
+
+model_loc_path = f"llava-1.5-7b-hf_network=language_pooling=last-token_pretrained=True_pvalues.npy"
+
 
 cache_dir = "cache"
 lang_mask_path = f"{cache_dir}/{model_loc_path}"
