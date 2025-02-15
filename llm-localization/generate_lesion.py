@@ -121,11 +121,13 @@ if __name__ == "__main__":
     else:
         model.set_language_selective_mask(None)
 
+    print("Language mask applied")
+
     # Prepare inputs and generate text
     inputs = tokenizer(prompt, return_tensors="pt").to(device)
     outputs = model.generate(
         **inputs,
-        max_length=20,
+        max_length=2, # original 20
         do_sample=True,
         temperature=0.7,
         num_return_sequences=1,
