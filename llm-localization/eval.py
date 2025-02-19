@@ -10,13 +10,17 @@ def run_eval(model, processor, device="cpu"):
     ds = load_dataset("nyu-mll/glue", "mnli_matched", split="validation").select(range(1000))
     glue_metric = load("glue", "cola")
     print(ds)
+    print(ds[0:5])
+    print(ds["label"][:2])
 
     predictions = []
-    references = ds["label"]
+    references = ds["label"][:1]
 
-    for i in range(1000):
-        # give more context (2 shot?)
-        text = ds["premise"][i] + " " + ds["hypothesis"][i]
+    for i in range(2, 3):
+        
+        text = ds["premise"][i-2] + " " + ds["hypothesis"][i-2] + " " + str(ds["label"][i-2]) + "\n" + \
+               ds["premise"][i-1] + " " + ds["hypothesis"][i-1] + " " + str(ds["label"][i-1]) + "\n" + \
+               ds["premise"][i] + " " + ds["hypothesis"][i] + "\n" 
 
         inputs = processor(images=None, text=text, return_tensors="pt").to(device, dtype=torch.float16)
 
@@ -35,9 +39,10 @@ def run_eval(model, processor, device="cpu"):
         
     assert len(predictions) == len(references), "Predictions and references must be the same length."
 
-
+    predictions[0] = int(predictions[0])
+    # Wrong, computing metric between text and integer...
     results = glue_metric.compute(predictions=predictions, references=references)
-
+    print(results)
 
 if __name__ == "__main__":
     run_eval(None, None, None)

@@ -25,6 +25,9 @@ TODO:
     - Create proper Class for it.
     - Should be able to run llava on it.
 
+#### Later stuff
+- Need to actually understand the language dataset, not hugely important, but for writing paper prob.
+
 
 
 
