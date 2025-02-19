@@ -15,7 +15,7 @@ pip install -r requirements.txt
 ## TODO
 
 TODO:
-1. We change generate_lesion.py so that it runs on benchmark and saves performance.
+1. We change generate_lesion.py so that it runs on different benchmarks and saves performance.
     - Glue, Blimp, SyntaxGym
 
 2. Get compute from AISIG?
@@ -25,7 +25,10 @@ TODO:
     - Create proper Class for it.
     - Should be able to run llava on it.
 
+4. Use GPT for making proper eval function!
+
 #### Later stuff
+- We should read something about benchmarks.
 - Need to actually understand the language dataset, not hugely important, but for writing paper prob.
 
 
