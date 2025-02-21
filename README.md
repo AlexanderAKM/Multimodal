@@ -16,6 +16,8 @@ pip install -r requirements.txt
 
 TODO:
 
+0. Gpt2 instead of large VLLM, for faster development
+
 1. Get compute from AISIG?
     - Rerun bash localize lesions for full dataset instead of 5.
 
