@@ -17,6 +17,10 @@ pip install -r requirements.txt
 TODO:
 
 0. Gpt2 instead of large VLLM, for faster development
+1. We change generate_lesion.py so that it runs on different benchmarks and saves performance.
+    - Glue, Blimp, SyntaxGym
+>>>>>>> 1f18313fb0fb2e81a0cfce47196deb7ecb6d86aa
+
 
 1. Get compute from AISIG?
     - Rerun bash localize lesions for full dataset instead of 5.
@@ -32,8 +36,12 @@ TODO:
 4. After vision dataset, run localize lesions on it.
 
 
+4. Use GPT for making proper eval function!
 
+#### Later stuff
 
+- We should read something about benchmarks.
+- Need to actually understand the language dataset, not hugely important, but for writing paper prob.
 
 
 

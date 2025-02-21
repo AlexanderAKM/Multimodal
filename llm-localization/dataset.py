@@ -68,6 +68,10 @@ class MDLocDataset(Dataset):
         """
         return len(self.positive) 
 
+
+class VisLocDataset(Dataset):
+    pass
+
 class LangLocDataset(Dataset):
     """
     A dataset that processes language localization stimuli from CSV files.
