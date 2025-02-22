@@ -90,6 +90,7 @@ if __name__ == "__main__":
         raise ValueError(f"Model {model_name} not supported")
 
     tokenizer = AutoTokenizer.from_pretrained(model_name)
+    processor = None
     model.to(device)
     model.eval()
     # print(model)
@@ -140,4 +141,8 @@ if __name__ == "__main__":
 
 
     # Benchmarks
-    run_eval(model, processor, device=device)
+
+    if processor is not None:
+        run_eval(model, processor=processor, device=device)
+    else:
+        run_eval(model, tokenizer=tokenizer, device=device)

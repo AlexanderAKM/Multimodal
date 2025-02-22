@@ -19,7 +19,6 @@ TODO:
 0. Gpt2 instead of large VLLM, for faster development
 1. We change generate_lesion.py so that it runs on different benchmarks and saves performance.
     - Glue, Blimp, SyntaxGym
->>>>>>> 1f18313fb0fb2e81a0cfce47196deb7ecb6d86aa
 
 
 1. Get compute from AISIG?
@@ -28,6 +27,7 @@ TODO:
 2. We change generate_lesion.py so that it runs on benchmark and saves performance.
     - Glue, Blimp, SyntaxGym
     - some vision dataset?
+    - BATCHING???
 
 3. We find/create vision dataset of images vs random pixels. 
     - Create proper Class for it.
