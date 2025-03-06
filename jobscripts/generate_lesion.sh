@@ -3,7 +3,7 @@
 #SBATCH --time=00:30:00
 #SBATCH --nodes=1
 #SBATCH --mem=32GB
-#SBATCH --gpus-per-node=n
+#SBATCH --gpus-per-node=1
 
 cd /home1/s5193400/Multimodal/llm-localization
 
