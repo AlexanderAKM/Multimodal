@@ -13,7 +13,7 @@ from models.modeling_gemma import GemmaForCausalLM
 from models.modeling_mistral import MistralForCausalLM
 from models.modeling_llava import LlavaForConditionalGeneration
 
-from eval import run_eval
+from eval import run_eval, get_log_likelihood, run_blimp, run_glue, run_syntaxgym
 
 # Directory for cached model data
 CACHE_DIR = os.environ.get("LOC_CACHE", "cache")
@@ -84,13 +84,17 @@ if __name__ == "__main__":
     elif "Mistral" in model_name:
         model = MistralForCausalLM.from_pretrained(model_name)
     elif "llava" in model_name:
-        model = LlavaForConditionalGeneration.from_pretrained(model_name, torch_dtype=torch.float16, device_map=device)
-        processor = AutoProcessor.from_pretrained(model_name)
+        model = LlavaForConditionalGeneration.from_pretrained(
+            model_name, torch_dtype=torch.float16, device_map=device
+            )
     else:
         raise ValueError(f"Model {model_name} not supported")
 
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     processor = None
+    if "llava" in model_name:
+        processor = AutoProcessor.from_pretrained(model_name)
+
     model.to(device)
     model.eval()
     # print(model)
@@ -142,7 +146,6 @@ if __name__ == "__main__":
 
     # Benchmarks
 
-    if processor is not None:
-        run_eval(model, processor=processor, device=device)
-    else:
-        run_eval(model, tokenizer=tokenizer, device=device)
+    run_glue(model, tokenizer, processor, device)
+    #run_blimp(model, tokenizer, device)
+    #run_syntaxgym(model, tokenizer, device)

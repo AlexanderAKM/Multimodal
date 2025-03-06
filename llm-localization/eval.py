@@ -6,6 +6,119 @@ import torch
 # args = PyTorchBenchmarkArguments(models=["google-bert/bert-base-uncased"], batch_sizes=[8], sequence_lengths=[8, 32, 128, 512])
 # benchmark = PyTorchBenchmark(args)
 
+
+def get_log_likelihood(text, model, tokenizer, device):
+    """
+    Compute the total log likelihood of a given text.
+    (This multiplies the per-token loss by the number of tokens.)
+    """
+    inputs = tokenizer(text, return_tensors="pt").to(device)
+    with torch.no_grad():
+        outputs = model(**inputs, labels=inputs["input_ids"])
+    # outputs.loss is averaged over tokens
+    log_likelihood = -outputs.loss.item() * inputs["input_ids"].shape[1]
+    return log_likelihood
+
+def run_glue(model, tokenizer, processor, device, num_examples=100):
+    """
+    Runs a prompt-based evaluation on GLUE’s MNLI task.
+    For each example, a prompt is constructed using the premise and hypothesis.
+    A simple keyword matching rule is used to map the generated text
+    to one of the three labels.
+    """
+    print("Running GLUE evaluation (MNLI)...")
+    ds = load_dataset("glue", "mnli", split=f"validation[:{num_examples}]")
+    # Mapping for MNLI labels: 0 -> contradiction, 1 -> neutral, 2 -> entailment.
+    label_map = {0: "contradiction", 1: "neutral", 2: "entailment"}
+    correct = 0
+    total = 0
+    for example in ds:
+        premise = example["premise"]
+        hypothesis = example["hypothesis"]
+        true_label = label_map[example["label"]]
+        prompt = (f"Premise: {premise}\n"
+                  f"Hypothesis: {hypothesis}\n"
+                  "Does the hypothesis follow from the premise? Answer:")
+        inputs = tokenizer(prompt, return_tensors="pt").to(device)
+        outputs = model.generate(**inputs, max_length=50)
+        output_text = tokenizer.decode(outputs[0], skip_special_tokens=True).lower()
+        # Simple keyword matching to extract a prediction
+        if "entail" in output_text:
+            pred_label = "entailment"
+        elif "contradict" in output_text:
+            pred_label = "contradiction"
+        elif "neutral" in output_text:
+            pred_label = "neutral"
+        else:
+            # Default if nothing obvious is found
+            pred_label = "neutral"
+        if pred_label == true_label:
+            correct += 1
+        total += 1
+    acc = correct / total if total > 0 else 0
+    print("GLUE (MNLI) accuracy:", acc)
+
+def run_blimp(model, tokenizer, device, num_examples=100):
+    """
+    Runs a BLiMP evaluation. Each example is assumed to have a pair of sentences:
+    one grammatical ('sentence_good') and one ungrammatical ('sentence_bad').
+    The model’s log likelihood is computed for each sentence; if the grammatical sentence
+    is assigned a higher likelihood, the example is counted as correct.
+    """
+    print("Running BLiMP evaluation...")
+    try:
+        ds = load_dataset("blimp", split=f"validation[:{num_examples}]")
+    except Exception as e:
+        print("BLiMP dataset not available. Skipping BLiMP evaluation.")
+        return
+    correct = 0
+    total = 0
+    for example in ds:
+        # Adjust the field names if your BLiMP dataset uses different keys.
+        if "sentence_good" in example and "sentence_bad" in example:
+            good = example["sentence_good"]
+            bad = example["sentence_bad"]
+        elif "good" in example and "bad" in example:
+            good = example["good"]
+            bad = example["bad"]
+        else:
+            continue
+        ll_good = get_log_likelihood(good, model, tokenizer, device)
+        ll_bad = get_log_likelihood(bad, model, tokenizer, device)
+        if ll_good > ll_bad:
+            correct += 1
+        total += 1
+    acc = correct / total if total > 0 else 0
+    print("BLiMP accuracy:", acc)
+
+def run_syntaxgym(model, tokenizer, device, num_examples=100):
+    """
+    Runs a SyntaxGym evaluation. The assumed structure is similar to BLiMP,
+    where each test item contains a grammatical sentence and a comparable
+    ungrammatical sentence. (Modify as needed to fit the actual SyntaxGym data.)
+    """
+    print("Running SyntaxGym evaluation...")
+    try:
+        ds = load_dataset("syntaxgym", split=f"validation[:{num_examples}]")
+    except Exception as e:
+        print("SyntaxGym dataset not available. Skipping SyntaxGym evaluation.")
+        return
+    correct = 0
+    total = 0
+    for example in ds:
+        if "sentence_good" in example and "sentence_bad" in example:
+            good = example["sentence_good"]
+            bad = example["sentence_bad"]
+        else:
+            continue
+        ll_good = get_log_likelihood(good, model, tokenizer, device)
+        ll_bad = get_log_likelihood(bad, model, tokenizer, device)
+        if ll_good > ll_bad:
+            correct += 1
+        total += 1
+    acc = correct / total if total > 0 else 0
+    print("SyntaxGym accuracy:", acc)
+
 def run_eval(model, tokenizer=None, processor=None, device="cpu"):
     assert model is not None, "Model must be provided."
     assert tokenizer is not None or processor is not None, "Tokenizer or processor must be provided."
