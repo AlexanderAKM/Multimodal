@@ -2,6 +2,9 @@ import numpy as np
 import pandas as pd
 from glob import glob
 from torch.utils.data import Dataset
+import cv2
+import os
+from tqdm import tqdm
 
 from utils import read_story, read_question
 
@@ -176,4 +179,49 @@ class TOMLocDataset(Dataset):
     
 class ImageLocDataset(Dataset):
     def _init__(self):
-        pass
+        """
+        Contains 50% images and 50% random pixels.
+
+        Loads images from a specified directory and creates and creates random pixel images.
+        """
+
+        # Load images from the specified directory
+        self.dirpath = "stimuli/image"
+        paths = glob(f"{self.dirpath}/*.jpg")
+        self.images = paths
+
+        # Shuffle the dataset
+        np.random.shuffle(self.images)
+        # Split the dataset into 50% images and 50% random pixels
+        self.images = self.images[:len(self.images)//2]
+        self.random_images = self.random_images[:len(self.images)//2]
+
+
+    def create_random_images(self, num_images=100):
+        # Create random pixel images
+        self.random_images = []
+
+        for idx in tqdm(range(num_images), desc="Creating random images", unit="image"):
+            # Generate a random image with shape (224, 224, 3)
+            random_image = np.random.randint(0, 256, (224, 224, 3), dtype=np.uint8)
+            self.random_images.append(random_image)
+            # Save the random image to a file
+            random_image_path = f"{self.dirpath}/random_{idx}.jpg"
+            cv2.imwrite(random_image_path, random_image)
+            self.images.append(random_image_path)
+
+    def __len__(self):
+        """
+        Returns the total number of images in the dataset.
+        """
+        return len(self.images)
+    
+    def __getitem__(self, idx):
+        """
+        Returns the image at the given index.
+        """
+        if idx < len(self.images):
+            return self.images[idx]
+        else:
+            return self.random_images[idx - len(self.images)]
+
