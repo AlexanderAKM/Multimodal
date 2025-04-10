@@ -71,3 +71,16 @@ def setup_hooks(model, layer_names):
         hooks.append(hook)
 
     return hooks, layer_representations
+
+
+def get_log_likelihood(text, model, tokenizer, device):
+    """
+    Compute the total log likelihood of a given text.
+    (This multiplies the per-token loss by the number of tokens.)
+    """
+    inputs = tokenizer(text, return_tensors="pt").to(device)
+    with torch.no_grad():
+        outputs = model(**inputs, labels=inputs["input_ids"])
+    # outputs.loss is averaged over tokens
+    log_likelihood = -outputs.loss.item() * inputs["input_ids"].shape[1]
+    return log_likelihood

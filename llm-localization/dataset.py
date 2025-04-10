@@ -111,8 +111,8 @@ class LangLocDataset(Dataset):
         self.negative = data[data["stim14"] == "N"]["sent"]
 
         # Limit the number of examples to 5, just for now as running time otherwise takes too long!
-        self.positive = self.positive.iloc[:5]
-        self.negative = self.negative.iloc[:5]
+        self.positive = self.positive.iloc#[:5]
+        self.negative = self.negative.iloc#[:5]
 
     def __getitem__(self, idx):
         """
